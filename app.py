@@ -7,6 +7,14 @@ app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://get-it-done:getitdone@l
 app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
 
+class Task(db.Model):
+    
+    id = db.Column(db.Integer, primary_key=True) # data type
+    name = db.Column(db.String(120))
+
+    def __init__(self, name):
+        self.name = name    
+        
 
 @app.route("/", methods=["POST", "GET"])
 def index():
