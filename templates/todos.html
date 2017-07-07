@@ -16,11 +16,15 @@
     <p>No tasks yet</p>
     {% else %}
 
-        <ul>
-            {% for task in tasks %}
-            <li>{{task}}</li>
-            {% endfor %}
-        </ul>
+    <ul>
+        {% for task in tasks %}
+        <li>{{task.name}}</li>
+        <form action="/delete-task" method="POST" class="delete-me">
+            <input type="hidden" name="task-id" value="{{task.id}}" />
+            <input type="submit" value="Done!" />
+        </form>
+        {% endfor %}
+    </ul>
 
     {% endif %}
 {% endblock %}
