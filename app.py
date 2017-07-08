@@ -43,11 +43,47 @@ def index():
 
 
 @app.route("/login")
-def login():
+def login_show():
     return render_template("login.html")
 
-@app.route("/register")
+@app.route("/login", methods=["POST"])
+def login():
+    email = request.form["email"]
+    password = request.form["password"]
+
+    user = User.query.filter_by(email=email).first() # user return or None
+
+    # if user exists and verified password
+    if user and user.password == password:
+        # TODO: "remember that user logged in"
+        return redirect("/")
+    else:
+        # TODO: tell them why the login failed
+        return "error"
+
+    return render_template("login.html")
+
+
+@app.route("/register", methods=["POST", "GET"])
 def register():
+    if request.method == "POST":
+        email = request.form["email"]
+        password = request.form["password"]
+        verify = request.form["verify"]
+        # TODO: validate user's data
+
+        existing_user = User.query.filter_by(email=email).first()
+        if not existing_user:
+            new_user = User(email, password)
+            db.session.add(new_user)
+            db.session.commit()
+            # TODO: remember the user
+            return redirect("/")
+        else:
+            # TODO: return message they are there and go to login
+            # maybe also reset password
+            return "duplicate"
+    
     return render_template("register.html")
 
 @app.route("/delete-task", methods=["POST"])
@@ -60,7 +96,7 @@ def delete_task():
 
     return redirect("/")
     
-
+# keep for true delete
 # @app.route("/delete-task", methods=["POST"])
 # def delete_task():
 #     task_id = int(request.form["task-id"])
@@ -73,3 +109,7 @@ def delete_task():
 
 if __name__ == "__main__":
     app.run()
+
+
+    # TODO:
+    # naming convention when spliting post and get request
