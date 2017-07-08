@@ -32,6 +32,14 @@ def index():
         tasks=tasks, completed_tasks=completed_tasks)
 
 
+@app.route("/login")
+def login():
+    return render_template("login.html")
+
+@app.route("/register")
+def register():
+    return render_template("register.html")
+
 @app.route("/delete-task", methods=["POST"])
 def delete_task():
     task_id = int(request.form["task-id"])
