@@ -91,14 +91,13 @@ def register():
             new_user = User(email, password)
             db.session.add(new_user)
             db.session.commit()
-            # TODO: remember the user
             session["email"] = email
+            flash("Welcome! You are registered and logged in!")
             return redirect("/")
         else:
-            # TODO: return message they are there and go to login
-            # maybe also reset password
-            return "duplicate"
-    
+            flash("Please try again.")
+            # TODO: add exact error messages later
+
     return render_template("register.html")
 
 @app.route("/logout")
