@@ -3,13 +3,23 @@
     <head>
         <title>{{title}}</title>
         <style>
-            .delete-me: inline-block;
+            .delete-me { display: inline-block; }
+            .error { color: red; }
         </style>
     </head>
 <body>
     <nav>
         <a href="./logout">logout</a>
     </nav>
+
+    {% with messages = get_flashed_messages(with_categories=True) %}
+        <ul>
+        {% for category,message in messages %}
+            <li class="{{category}}">{{message}}</li>
+        {% endfor %}
+        </ul>
+    {% endwith %}
+
     {% block content %}
     {% endblock %}
 

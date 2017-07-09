@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template, session
+from flask import Flask, request, redirect, render_template, session, flash
 from flask_sqlalchemy import SQLAlchemy 
 
 app = Flask(__name__)
@@ -69,12 +69,11 @@ def login():
 
         # if user exists and verified password
         if user and user.password == password:
-            # TODO: "remember that user logged in"
             session["email"] = email
+            flash("You are logged in!")
             return redirect("/")
         else:
-            # TODO: tell them why the login failed
-            return "error"
+            flash("Password is incorrect, or user does not exist", "error")
 
         return render_template("login.html")
 
@@ -105,6 +104,7 @@ def register():
 @app.route("/logout")
 def logout():
     del session["email"]
+    flash("You are logged out!")
     return redirect("/")
 
 @app.route("/delete-task", methods=["POST"])
