@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template
+from flask import Flask, request, redirect, render_template, session
 from flask_sqlalchemy import SQLAlchemy 
 
 app = Flask(__name__)
@@ -6,6 +6,7 @@ app.config["DEBUG"] = True
 app.config["SQLALCHEMY_DATABASE_URI"] = 'mysql+pymysql://get-it-done:getitdone@localhost:3306/get-it-done'
 app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
+app.secret_key = "8FYqLBM0Fgs633*Xxas67!M2wIYGnQc9%h8" # needed for session (right now)
 
 class Task(db.Model):
     
@@ -27,6 +28,20 @@ class User(db.Model):
         self.email = email
         self.password = password
 
+# @app.before_request
+# def require_login():
+#     allowed_routes = ["login", "register"]
+#     # if ("email" not in session) and (request.endpoint not in allowed_routes):
+#     if request.endpoint not in allowed_routes and 'email' not in session:
+#         return redirect("/login")
+
+@app.before_request
+def require_login():
+    allowed_routes = ["login", "register"] # these are names for methods and not request routes!
+    if request.endpoint not in allowed_routes and "email" not in session:
+        print(request.endpoint)
+        return redirect("/login")
+
 @app.route("/", methods=["POST", "GET"])
 def index():
     
@@ -42,26 +57,26 @@ def index():
         tasks=tasks, completed_tasks=completed_tasks)
 
 
-@app.route("/login")
-def login_show():
-    return render_template("login.html")
-
-@app.route("/login", methods=["POST"])
+@app.route("/login", methods=["POST", "GET"])
 def login():
-    email = request.form["email"]
-    password = request.form["password"]
-
-    user = User.query.filter_by(email=email).first() # user return or None
-
-    # if user exists and verified password
-    if user and user.password == password:
-        # TODO: "remember that user logged in"
-        return redirect("/")
+    if request.method == "GET":
+        return render_template("login.html")
     else:
-        # TODO: tell them why the login failed
-        return "error"
+        email = request.form["email"]
+        password = request.form["password"]
 
-    return render_template("login.html")
+        user = User.query.filter_by(email=email).first() # user return or None
+
+        # if user exists and verified password
+        if user and user.password == password:
+            # TODO: "remember that user logged in"
+            session["email"] = email
+            return redirect("/")
+        else:
+            # TODO: tell them why the login failed
+            return "error"
+
+        return render_template("login.html")
 
 
 @app.route("/register", methods=["POST", "GET"])
@@ -78,6 +93,7 @@ def register():
             db.session.add(new_user)
             db.session.commit()
             # TODO: remember the user
+            session["email"] = email
             return redirect("/")
         else:
             # TODO: return message they are there and go to login
@@ -85,6 +101,11 @@ def register():
             return "duplicate"
     
     return render_template("register.html")
+
+@app.route("/logout")
+def logout():
+    del session["email"]
+    return redirect("/")
 
 @app.route("/delete-task", methods=["POST"])
 def delete_task():
