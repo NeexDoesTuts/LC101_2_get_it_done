@@ -123,7 +123,7 @@ db.session.commit()
 
 Now the database has one table and 2 tasks in it:
 
-![](db_with_tasks.png)
+![](readme_images/db_with_tasks.png)
 
 ## Get data from the database
 
@@ -249,7 +249,7 @@ def delete_task():
 
 Now the database works as expected:
 
-![](db_delete_with_flag.png)
+![](readme_images/db_delete_with_flag.png)
 
 But the view does not work as expected. We still just show all tasks. And we have to filter only task with `completed=False`. To do this, in index handler split tasks to show completed and not yet completed separately:
 
